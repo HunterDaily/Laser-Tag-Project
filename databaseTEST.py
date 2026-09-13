@@ -15,11 +15,18 @@ try:
             highestID = curs.fetchone()[0]
             
             # Gets codename value
-            nameToAdd = str(input("What is your codename? "))
+            nameToAdd = str(input("What is the first player's codename? "))
             
             # Inserts codename and ID into DB
             curs.execute(f"INSERT INTO players (id, codename) VALUES (%s, %s);",
             (highestID + 1, nameToAdd,))
+            
+            # Gets codename value
+            nameToAdd = str(input("What is the second player's codename? "))
+            
+            # Inserts codename and ID into DB
+            curs.execute(f"INSERT INTO players (id, codename) VALUES (%s, %s);",
+            (highestID + 2, nameToAdd,))
             
             # Prints out entire table
             curs.execute("""
@@ -28,7 +35,7 @@ try:
             print(curs.fetchall())
             
         
-    print("Okay database stuff kinda works")
+    print("Players added successfully.")
 
 except Exception as e:
     print(f"An error occurred: {e}")
