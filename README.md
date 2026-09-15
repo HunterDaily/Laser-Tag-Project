@@ -2,11 +2,7 @@
 
 ## Getting started
 
-Ensure that [psycopg](https://www.psycopg.org/) and [pygame](https://www.pygame.org/docs/) are installed on your machine using the following commands:
-```
-pip install "psycopg[binary]"
-pip install pygame
-```
+Ensure that [psycopg](https://www.psycopg.org/) and [pygame](https://www.pygame.org/docs/) are installed on your machine by running the provided install script.
 
 ## Credits  
 |      Name      |    Username    |
