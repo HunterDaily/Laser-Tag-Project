@@ -1,5 +1,14 @@
 import pygame
 import sys
+import psycopg
+
+try:
+    with psycopg.connect(
+        dbname="photon"
+    ) as conn:
+        pass
+except Exception as e:
+    print(f"An error occurred: {e}")
 
 pygame.init()
 
