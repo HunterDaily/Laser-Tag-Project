@@ -170,15 +170,13 @@ def entryScreen():
                     rowSelector = 0
 
             #starts key input after pressing enter key
-            if event.key == pygame.K_RETURN:
+            if event.key == pygame.K_TAB:
                 if typingCheck == False:
                     #starts editing for selected player
                     typingCheck = True
                     keyInput = ""
                     pygame.key.start_text_input()
-            #moves to the next field after pressting tab
-            if event.key == pygame.K_TAB:
-                if typingCheck == True:
+                else:
                     if teamSelector == "red":
                         if inputMode == 0:
                             redTeam[rowSelector][0] = keyInput
