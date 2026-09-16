@@ -12,7 +12,7 @@ gameScreen = pygame.display.set_mode((windowWidth, windowHeight))
 pygame.display.set_caption("Entry Terminal")
 
 #Splash screen 
-logo = pygame.image.load("logo.jpg")
+logo = pygame.image.load("photon-main\logo.jpg")
 logo = pygame.transform.scale(logo, (800, 400))
 
 
