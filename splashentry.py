@@ -2,11 +2,11 @@ import pygame
 import sys
 import psycopg
 
+#Connect to database
+conn = ""
 try:
-    with psycopg.connect(
-        dbname="photon"
-    ) as conn:
-        pass
+    conn = psycopg.connect(dbname="photon")
+    curr = conn.cursor()
 except Exception as e:
     print(f"An error occurred: {e}")
 
@@ -56,6 +56,15 @@ typingCheck = False
 keyInput    = ""
 inputMode   = 0
 counter = 0
+
+#Imports rows from database
+curr.execute("SELECT * FROM Players;")
+for Row in curr.fetchall():
+	if Row[0] <= len(redTeam):
+		redTeam[Row[0]-1] = [Row[1], None]
+	elif Row[0] <= (len(redTeam) + len(greenTeam)):
+		greenTeam[Row[0]-16] = [Row[1], None]
+typingCheck = False
 
 def entryScreen():
     global gameRunning, rowSelector, teamSelector, typingCheck, keyInput, inputMode, redTeam, greenTeam
