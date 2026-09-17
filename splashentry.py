@@ -7,6 +7,7 @@ conn = ""
 try:
     conn = psycopg.connect(dbname="photon")
     curr = conn.cursor()
+    conn.autocommit = True
 except Exception as e:
     print(f"An error occurred: {e}")
 
@@ -21,7 +22,8 @@ gameScreen = pygame.display.set_mode((windowWidth, windowHeight))
 pygame.display.set_caption("Entry Terminal")
 
 #Splash screen 
-logo = pygame.image.load("photon-main/logo.jpg")
+#logo = pygame.image.load("photon-main\logo.jpg") #Use on Windows machines
+logo = pygame.image.load("photon-main/logo.jpg") #Use on Linux machines
 logo = pygame.transform.scale(logo, (800, 400))
 
 
@@ -188,6 +190,11 @@ def entryScreen():
                             typingCheck = False
                             keyInput = ""
                             pygame.key.stop_text_input()
+
+                            #Inserts Red Team values into DB
+                            curr.execute("INSERT INTO Players (id, codename) VALUES (%s, %s);", 
+                                        (rowSelector + 1, redTeam[rowSelector][0]),
+                                        )
                     if teamSelector == "green":
                         if inputMode == 0:
                             greenTeam[rowSelector][0] = keyInput
@@ -199,6 +206,11 @@ def entryScreen():
                             typingCheck = False
                             keyInput = ""
                             pygame.key.stop_text_input()
+
+                            #Inserts Green Team values into DB
+                            curr.execute("INSERT INTO Players (id, codename) VALUES (%s, %s);", 
+                                         (rowSelector + 16, greenTeam[rowSelector][0]),
+                                         )
 
             #backspace to delete while typing
             if event.key == pygame.K_BACKSPACE:
@@ -230,6 +242,8 @@ while gameRunning:
         pygame.display.flip()
     else:
         entryScreen()
-        
+
+curr.close()
+conn.close()
 pygame.quit()
 sys.exit()
