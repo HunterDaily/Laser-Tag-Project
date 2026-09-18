@@ -1,6 +1,10 @@
 import pygame
 import sys
 import psycopg
+from SocketManager import SocketManager # Custom networking class.
+
+# Initialize socket manager
+network = SocketManager()
 
 #Connect to database
 conn = ""
