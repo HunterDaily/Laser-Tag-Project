@@ -240,9 +240,9 @@ def entryScreen():
 
 while gameRunning:
     if counter < 1500:
-        #display Spash Screen
+        #display Splash Screen
         counter += 1
-        gameScreen.blit(logo, (125, 125))
+        gameScreen.blit(logo, (0, 0)) # Adjusted to top left corner to fit logo across entire screen.
         pygame.display.flip()
     else:
         entryScreen()
