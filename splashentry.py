@@ -9,13 +9,11 @@ network = SocketManager()
 # Network Popup Variables:
 networkPopup = False
 networkAddress = "127.0.0.255" # Default broadcast address.
-networkInput = "" # Input typing variable similar to the player entry screen's.
 
 # Popup function to draw network & later other popups:
 def draw_popup(input_text, description):
     # Main Box:
     pygame.draw.rect(gameScreen, blackRGB, (250, 200, 500, 225))
-    pygame.draw.rect(gameScreen, whiteText, (250, 200, 500, 225), 2) # Outline.
     # Prompt Text:
     prompt = playerFont.render(description, True, blueTitle)
     gameScreen.blit(prompt, (260, 210))
@@ -94,7 +92,7 @@ typingCheck = False
 
 def entryScreen():
     global gameRunning, rowSelector, teamSelector, typingCheck, keyInput, inputMode, redTeam, greenTeam # Original player entry variables.
-    global networkPopup, networkAddress, networkInput # Network popup variables.
+    global networkPopup, networkAddress # Network popup variables.
 
     #background color
     gameScreen.fill(blackRGB)
@@ -181,15 +179,16 @@ def entryScreen():
             if event.key == pygame.K_F1: # Currently using F1 because we were given zero direction on what key to use, even though I believe F1 may end up being needed later.
                 if networkPopup == False:
                     networkPopup = True # Oh I'm toggling it!
-                    networkInput = networkAddress # This is because we want to display the current broadcast address and have it be editable.
+                    keyInput = networkAddress # This is because we want to display the current broadcast address and have it be editable.
                     pygame.key.start_text_input()
                 else: # This means we're closing the popup, so we must update the network with whatever address we ended on.
-                    networkAddress = networkInput
+                    networkAddress = keyInput
                     network.change_network(networkAddress) # Passing it over to our SocketManager.
+                    print("Changed network to: " + networkAddress)
                     networkPopup = False
                     pygame.key.stop_text_input()
 
-            if typingCheck == False:
+            if typingCheck == False and networkPopup == False: # Conditional to lock the popup.
                 #team switching
                 if event.key == pygame.K_LEFT:
                     teamSelector = "red"
@@ -209,7 +208,7 @@ def entryScreen():
                     rowSelector = 0
 
             #starts key input after pressing enter key
-            if event.key == pygame.K_TAB:
+            if event.key == pygame.K_TAB and networkPopup == False: # Conditional to lock the popup.
                 if typingCheck == False:
                     #starts editing for selected player
                     typingCheck = True
@@ -251,12 +250,16 @@ def entryScreen():
 
             #backspace to delete while typing
             if event.key == pygame.K_BACKSPACE:
-                if typingCheck == True:
+                if networkPopup: # Popup doesn't care about the input mode.
+                    keyInput = keyInput[:-1]
+                elif typingCheck == True:
                     keyInput = keyInput[:-1]
                     
         #adds the typed key into the input (name/equipment ID)
         if event.type == pygame.TEXTINPUT:
-            if typingCheck == True:
+            if networkPopup:
+                keyInput += event.text
+            elif typingCheck == True:
                 if inputMode == 0:
                     keyInput += event.text
                 elif inputMode == 1:
@@ -270,7 +273,7 @@ def entryScreen():
 
     # Network Popup Drawing:
     if networkPopup:
-        draw_popup(networkInput, "Enter Target Broadcast Address:") # Calls modular popup function with network parameters.
+        draw_popup(keyInput, "Enter Target Broadcast Address:") # Calls modular popup function with network parameters.
 
     #updates the screen
     pygame.display.flip()
