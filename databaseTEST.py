@@ -1,4 +1,4 @@
-import psycopg
+import psycopg # type: ignore -> Just so we don't have constantly get an import warning.
 
 try:
     with psycopg.connect(

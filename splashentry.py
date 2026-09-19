@@ -1,6 +1,6 @@
 import pygame
 import sys
-import psycopg
+import psycopg # type: ignore -> Just so we don't have constantly get an import warning.
 from SocketManager import SocketManager # Custom networking class.
 
 # Initialize socket manager
@@ -19,7 +19,7 @@ pygame.init()
 
 #entry screen window size variables
 windowWidth = 1000
-windowHeight = 750
+windowHeight = 625 # Previously 750, I'm adjusting to better fit the spashscreen logo's size ratio.
 
 #entry screen window using the window size variable
 gameScreen = pygame.display.set_mode((windowWidth, windowHeight))
@@ -28,7 +28,7 @@ pygame.display.set_caption("Entry Terminal")
 #Splash screen 
 #logo = pygame.image.load("photon-main\logo.jpg") #Use on Windows machines
 logo = pygame.image.load("photon-main/logo.jpg") #Use on Linux machines
-logo = pygame.transform.scale(logo, (800, 400))
+logo = pygame.transform.scale(logo, (1000, 625)) # Logo is weirdly 3487 by 2221 originally, somewhat close to a 16:10 ratio. Original sizing was to 800 and 400.
 
 
 #colors to make the player entry screen.
