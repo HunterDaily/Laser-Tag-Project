@@ -218,8 +218,7 @@ def entryScreen():
                 if equipmentPopup:
                     if keyInput: # Error handling for empty input.
                         # Broadcast Equipment ID:
-                        network.broadcast(keyInput) # Later on we should be validate this ID and save it to a table matched with player ID.
-                        print("Broadcasted equipment ID: " + keyInput)
+                        network.broadcast(keyInput) # Later on we should be validate this ID and save it to a table matched with player ID.                
                         equipmentPopup = False # Closing up popup.
                         keyInput = ""
                     pygame.key.stop_text_input()
