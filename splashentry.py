@@ -183,8 +183,11 @@ def entryScreen():
                     pygame.key.start_text_input()
                 else: # This means we're closing the popup, so we must update the network with whatever address we ended on.
                     networkAddress = keyInput
-                    network.change_network(networkAddress) # Passing it over to our SocketManager.
-                    print("Changed network to: " + networkAddress)
+                    if network.validate_network(networkAddress): # First checking validation, then changing network.
+                        network.change_network(networkAddress)
+                        print("Changed network to: " + networkAddress)
+                    else:
+                        print("Invalid network address.") # Very responsive and professional error handling comments if I say so myself.
                     networkPopup = False
                     pygame.key.stop_text_input()
 
