@@ -6,6 +6,26 @@ from SocketManager import SocketManager # Custom networking class.
 # Initialize socket manager
 network = SocketManager()
 
+# Network Popup Variables:
+networkPopup = False
+networkAddress = "127.0.0.255" # Default broadcast address.
+networkInput = "" # Input typing variable similar to the player entry screen's.
+
+# Popup function to draw network & later other popups:
+def draw_popup(input_text, description):
+    # Main Box:
+    pygame.draw.rect(gameScreen, blackRGB, (250, 200, 500, 225))
+    pygame.draw.rect(gameScreen, whiteText, (250, 200, 500, 225), 2) # Outline.
+    # Prompt Text:
+    prompt = playerFont.render(description, True, blueTitle)
+    gameScreen.blit(prompt, (260, 210))
+    # Input Box:
+    pygame.draw.rect(gameScreen, whiteText, (260, 250, 480, 30))
+    # Input Text:
+    input_text_render = playerFont.render(input_text, True, blackRGB)
+    gameScreen.blit(input_text_render, (260, 250))
+
+
 #Connect to database
 conn = ""
 try:
@@ -73,7 +93,8 @@ for Row in curr.fetchall():
 typingCheck = False
 
 def entryScreen():
-    global gameRunning, rowSelector, teamSelector, typingCheck, keyInput, inputMode, redTeam, greenTeam
+    global gameRunning, rowSelector, teamSelector, typingCheck, keyInput, inputMode, redTeam, greenTeam # Original player entry variables.
+    global networkPopup, networkAddress, networkInput # Network popup variables.
 
     #background color
     gameScreen.fill(blackRGB)
@@ -156,6 +177,18 @@ def entryScreen():
         #checks to see if user uses presses a key
         if event.type == pygame.KEYDOWN:
                 
+            # Network Popup Toggle:
+            if event.key == pygame.K.F1: # Currently using F1 because we were given zero direction on what key to use, even though I believe F1 may end up being needed later.
+                if networkPopup == False:
+                    networkPopup = True # Oh I'm toggling it!
+                    networkInput = networkAddress # This is because we want to display the current broadcast address and have it be editable.
+                    pygame.key.start_text_input()
+                else: # This means we're closing the popup, so we must update the network with whatever address we ended on.
+                    networkAddress = networkInput
+                    network.change_network(networkAddress) # Passing it over to our SocketManager.
+                    networkPopup = False
+                    pygame.key.stop_text_input()
+
             if typingCheck == False:
                 #team switching
                 if event.key == pygame.K_LEFT:
@@ -234,10 +267,15 @@ def entryScreen():
         #if user closes entry window, stops the program
         if event.type == pygame.QUIT:
             gameRunning = False
+
+    # Network Popup Drawing:
+    if networkPopup:
+        draw_popup(networkInput, "Enter Target Broadcast Address:") # Calls modular popup function with network parameters.
+
     #updates the screen
     pygame.display.flip()
     
-
+# Actual Program Loop:
 while gameRunning:
     if counter < 1500:
         #display Splash Screen
@@ -247,6 +285,7 @@ while gameRunning:
     else:
         entryScreen()
 
+# Closing Statements:
 curr.close()
 conn.close()
 pygame.quit()
