@@ -178,7 +178,7 @@ def entryScreen():
         if event.type == pygame.KEYDOWN:
                 
             # Network Popup Toggle:
-            if event.key == pygame.K.F1: # Currently using F1 because we were given zero direction on what key to use, even though I believe F1 may end up being needed later.
+            if event.key == pygame.K_F1: # Currently using F1 because we were given zero direction on what key to use, even though I believe F1 may end up being needed later.
                 if networkPopup == False:
                     networkPopup = True # Oh I'm toggling it!
                     networkInput = networkAddress # This is because we want to display the current broadcast address and have it be editable.
