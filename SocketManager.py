@@ -9,7 +9,7 @@ class SocketManager: # Tiny class built to make network swapping easy and offeri
     def change_network(self, target_address): # No longer two lines! Actually has a somewhat significant feature now with the whole validation thing.
         if not self.validate_network(target_address): # Let's first make sure the address is valid before we try to use it.
             print("Invalid network address: " + target_address + ".")
-            return
+            return False # Failed.
         self.broadcaster.close()
         self.broadcaster = Broadcast(target_address)
         return True # Allows us to check if the network change went through back in the main file.

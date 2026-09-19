@@ -8,7 +8,8 @@ network = SocketManager()
 
 # Network Popup Variables:
 networkPopup = False
-networkAddress = "127.0.0.255" # Default broadcast address.
+networkDefault = "127.0.0.255" # Default broadcast address.
+networkAddress = "127.0.0.255" # Starting broadcast address. I swear it makes sense.
 
 # Popup function to draw network & later other popups:
 def draw_popup(input_text, description):
@@ -188,6 +189,7 @@ def entryScreen():
                         print("Changed network to: " + networkAddress)
                     else:
                         print("Invalid network address.") # Very responsive and professional error handling comments if I say so myself.
+                        networkAddress = networkDefault # Resetting to default when invalid.
                     networkPopup = False
                     pygame.key.stop_text_input()
 
