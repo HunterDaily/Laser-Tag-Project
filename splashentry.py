@@ -8,6 +8,7 @@ network = SocketManager()
 
 # Network Popup Variables:
 networkPopup = False
+equipmentPopup = False # Secondary popup for when we need to prompt for equipment ID.
 networkDefault = "127.0.0.255" # Default broadcast address.
 networkAddress = "127.0.0.255" # Starting broadcast address. I swear it makes sense.
 
@@ -93,7 +94,7 @@ typingCheck = False
 
 def entryScreen():
     global gameRunning, rowSelector, teamSelector, typingCheck, keyInput, inputMode, redTeam, greenTeam # Original player entry variables.
-    global networkPopup, networkAddress # Network popup variables.
+    global networkPopup, networkAddress, equipmentPopup # Network and equipment popup variables.
 
     #background color
     gameScreen.fill(blackRGB)
@@ -193,7 +194,7 @@ def entryScreen():
                     networkPopup = False
                     pygame.key.stop_text_input()
 
-            if typingCheck == False and networkPopup == False: # Conditional to lock the popup.
+            if typingCheck == False and networkPopup == False and equipmentPopup == False: # Conditionals to lock the popup.
                 #team switching
                 if event.key == pygame.K_LEFT:
                     teamSelector = "red"
@@ -214,7 +215,15 @@ def entryScreen():
 
             #starts key input after pressing enter key
             if event.key == pygame.K_TAB and networkPopup == False: # Conditional to lock the popup.
-                if typingCheck == False:
+                if equipmentPopup:
+                    if keyInput: # Error handling for empty input.
+                        # Broadcast Equipment ID:
+                        network.broadcast(int(keyInput)) # Later on we should be validate this ID and save it to a table matched with player ID.
+                        print("Broadcasted equipment ID: " + keyInput)
+                        equipmentPopup = False # Closing up popup.
+                        keyInput = ""
+                    pygame.key.stop_text_input()
+                elif typingCheck == False:
                     #starts editing for selected player
                     typingCheck = True
                     keyInput = ""
@@ -229,8 +238,8 @@ def entryScreen():
                             redTeam[rowSelector][1] = keyInput
                             inputMode = 0
                             typingCheck = False
+                            equipmentPopup = True # "After player id number has been entered, system will prompt for the equipment id that the player is using"
                             keyInput = ""
-                            pygame.key.stop_text_input()
 
                             #Inserts Red Team values into DB
                             curr.execute("INSERT INTO Players (id, codename) VALUES (%s, %s);", 
@@ -245,8 +254,8 @@ def entryScreen():
                             greenTeam[rowSelector][1] = keyInput
                             inputMode = 0
                             typingCheck = False
+                            equipmentPopup = True # "After player id number has been entered, system will prompt for the equipment id that the player is using"
                             keyInput = ""
-                            pygame.key.stop_text_input()
 
                             #Inserts Green Team values into DB
                             curr.execute("INSERT INTO Players (id, codename) VALUES (%s, %s);", 
@@ -255,20 +264,23 @@ def entryScreen():
 
             #backspace to delete while typing
             if event.key == pygame.K_BACKSPACE:
-                if networkPopup: # Popup doesn't care about the input mode.
+                if networkPopup or equipmentPopup: # Popup doesn't care about the input mode.
                     keyInput = keyInput[:-1]
                 elif typingCheck == True:
                     keyInput = keyInput[:-1]
                     
-        #adds the typed key into the input (name/equipment ID)
+        #adds the typed key into the input (name/player ID)
         if event.type == pygame.TEXTINPUT:
             if networkPopup:
                 keyInput += event.text
+            elif equipmentPopup:
+                if event.text.isdigit(): # Only digits for equipment ID.
+                    keyInput += event.text
             elif typingCheck == True:
                 if inputMode == 0:
                     keyInput += event.text
                 elif inputMode == 1:
-                    #makes sure that the user can only input numbers for equipment ID
+                    #makes sure that the user can only input numbers for player ID
                     if event.text.isdigit():
                         keyInput += event.text
 
@@ -280,6 +292,10 @@ def entryScreen():
     if networkPopup:
         draw_popup(keyInput, "Enter Target Broadcast Address:") # Calls modular popup function with network parameters.
 
+    # Equipment Popup Drawing:
+    if equipmentPopup:
+        draw_popup(keyInput, "Enter Equipment ID:") # Same thing as ^ but for equipment ID.
+    
     #updates the screen
     pygame.display.flip()
     
