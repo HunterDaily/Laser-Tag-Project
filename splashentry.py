@@ -85,7 +85,7 @@ def splashScreen():
     logo = pygame.image.load("photon-main/logo.jpg") #Use on Linux machines
     logo = pygame.transform.scale(logo, (1000, 625)) # Logo is weirdly 3487 by 2221 originally, somewhat close to a 16:10 ratio. Original sizing was to 800 and 400.
     counter = 0
-    while counter < 1500:
+    while counter < 750:
         #display Splash Screen
         counter += 1
         pygame.event.pump() # This is to prevent the window from freezing while the splash screen is displayed.
