@@ -6,50 +6,18 @@ from SocketManager import SocketManager # Custom networking class.
 # Initialize socket manager
 network = SocketManager()
 
+# Start pygame
+pygame.init()
+
 # Network Popup Variables:
 networkPopup = False
 equipmentPopup = False # Secondary popup for when we need to prompt for equipment ID.
 networkDefault = "127.0.0.255" # Default broadcast address.
 networkAddress = "127.0.0.255" # Starting broadcast address. I swear it makes sense.
 
-# Popup function to draw network & later other popups:
-def draw_popup(input_text, description):
-    # Main Box:
-    pygame.draw.rect(gameScreen, blackRGB, (250, 200, 500, 225))
-    # Prompt Text:
-    prompt = playerFont.render(description, True, blueTitle)
-    gameScreen.blit(prompt, (260, 210))
-    # Input Box:
-    pygame.draw.rect(gameScreen, whiteText, (260, 250, 480, 30))
-    # Input Text:
-    input_text_render = playerFont.render(input_text, True, blackRGB)
-    gameScreen.blit(input_text_render, (260, 250))
-
-
-#Connect to database
-conn = ""
-try:
-    conn = psycopg.connect(dbname="photon")
-    curr = conn.cursor()
-    conn.autocommit = True
-except Exception as e:
-    print(f"An error occurred: {e}")
-
-pygame.init()
-
 #entry screen window size variables
 windowWidth = 1000
 windowHeight = 625 # Previously 750, I'm adjusting to better fit the spashscreen logo's size ratio.
-
-#entry screen window using the window size variable
-gameScreen = pygame.display.set_mode((windowWidth, windowHeight))
-pygame.display.set_caption("Entry Terminal")
-
-#Splash screen 
-#logo = pygame.image.load("photon-main\logo.jpg") #Use on Windows machines
-logo = pygame.image.load("photon-main/logo.jpg") #Use on Linux machines
-logo = pygame.transform.scale(logo, (1000, 625)) # Logo is weirdly 3487 by 2221 originally, somewhat close to a 16:10 ratio. Original sizing was to 800 and 400.
-
 
 #colors to make the player entry screen.
 blackRGB        = (0, 0, 0)
@@ -64,36 +32,72 @@ teamNames = pygame.font.Font(None, 25)
 columnFont = pygame.font.Font(None, 25)
 playerFont = pygame.font.Font(None, 25)
 
-#variable to make sure the entry screen is still running.
-gameRunning     = True
-
 #selecting rows/teams variables
 rowSelector     = 0
 teamSelector    = "red"
 
 #arrays for storing player's names/equipment ID
-redTeam     = []
-greenTeam   = []
-#making it into 15 elements with name/equipment ID for each team
-for numPlayers in range(15):
-    redTeam.append([None, None])
-    greenTeam.append([None, None])
+redTeam     = [[None,None] for _ in range(15)]  # Initialize with 15 elements, each containing [None, None]
+greenTeam   = [[None,None] for _ in range(15)]  # Initialize with 15 elements, each containing [None, None]
+
+#typing variables
 typingCheck = False
 keyInput    = ""
 inputMode   = 0
-counter = 0
 
-#Imports rows from database
-curr.execute("SELECT * FROM Players;")
-for Row in curr.fetchall():
-	if Row[0] <= len(redTeam):
-		redTeam[Row[0]-1] = [Row[1], None]
-	elif Row[0] <= (len(redTeam) + len(greenTeam)):
-		greenTeam[Row[0]-16] = [Row[1], None]
-typingCheck = False
+# Popup function to draw network & later other popups:
+def draw_popup(input_text, description):
+    # Main Box:
+    pygame.draw.rect(gameScreen, blackRGB, (250, 200, 500, 225))
+    # Prompt Text:
+    prompt = playerFont.render(description, True, blueTitle)
+    gameScreen.blit(prompt, (260, 210))
+    # Input Box:
+    pygame.draw.rect(gameScreen, whiteText, (260, 250, 480, 30))
+    # Input Text:
+    input_text_render = playerFont.render(input_text, True, blackRGB)
+    gameScreen.blit(input_text_render, (260, 250))
 
-def entryScreen():
-    global gameRunning, rowSelector, teamSelector, typingCheck, keyInput, inputMode, redTeam, greenTeam # Original player entry variables.
+# Connect to database
+def connect_to_database():
+    try:
+        conn = psycopg.connect(dbname="photon")
+        curr = conn.cursor()
+        conn.autocommit = True
+        return conn, curr
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        sys.exit(1)  # Exit the program if the database connection fails
+
+# Imports rows from database
+def fill_from_database(curr):
+    global redTeam, greenTeam
+    curr.execute("SELECT * FROM Players;")
+    for Row in curr.fetchall():
+        if 1 <= Row[0] <= len(redTeam):
+            redTeam[Row[0]-1] = [Row[1], None]
+        elif len(redTeam) <= Row[0] <= (len(redTeam) + len(greenTeam)):
+            greenTeam[Row[0]-16] = [Row[1], None]
+
+# Display splash screen
+def splashScreen():
+    #logo = pygame.image.load("photon-main\logo.jpg") #Use on Windows machines
+    logo = pygame.image.load("photon-main/logo.jpg") #Use on Linux machines
+    logo = pygame.transform.scale(logo, (1000, 625)) # Logo is weirdly 3487 by 2221 originally, somewhat close to a 16:10 ratio. Original sizing was to 800 and 400.
+    counter = 0
+    while counter < 1500:
+        #display Splash Screen
+        counter += 1
+        pygame.event.pump() # This is to prevent the window from freezing while the splash screen is displayed.
+        gameScreen.blit(logo, (0, 0)) # Adjusted to top left corner to fit logo across entire screen.
+        pygame.display.flip()
+
+#entry screen window using the window size variable
+gameScreen = pygame.display.set_mode((windowWidth, windowHeight))
+pygame.display.set_caption("Entry Terminal")
+
+def entryScreen(curr) -> bool:
+    global rowSelector, teamSelector, typingCheck, keyInput, inputMode, redTeam, greenTeam # Original player entry variables.
     global networkPopup, networkAddress, equipmentPopup # Network and equipment popup variables.
 
     #background color
@@ -178,7 +182,7 @@ def entryScreen():
         if event.type == pygame.KEYDOWN:
                 
             # Network Popup Toggle:
-            if event.key == pygame.K_F1: # Currently using F1 because we were given zero direction on what key to use, even though I believe F1 may end up being needed later.
+            if event.key == pygame.K_F1 and not typingCheck and not equipmentPopup: # Currently using F1 because we were given zero direction on what key to use, even though I believe F1 may end up being needed later.
                 if networkPopup == False:
                     networkPopup = True # Oh I'm toggling it!
                     keyInput = networkAddress # This is because we want to display the current broadcast address and have it be editable.
@@ -221,7 +225,7 @@ def entryScreen():
                         network.broadcast(keyInput) # Later on we should be validate this ID and save it to a table matched with player ID.                
                         equipmentPopup = False # Closing up popup.
                         keyInput = ""
-                    pygame.key.stop_text_input()
+                        pygame.key.stop_text_input()
                 elif typingCheck == False:
                     #starts editing for selected player
                     typingCheck = True
@@ -241,9 +245,12 @@ def entryScreen():
                             keyInput = ""
 
                             #Inserts Red Team values into DB
-                            curr.execute("INSERT INTO Players (id, codename) VALUES (%s, %s);", 
-                                        (rowSelector + 1, redTeam[rowSelector][0]),
-                                        )
+                            try:
+                                curr.execute("INSERT INTO Players (id, codename) VALUES (%s, %s);", 
+                                            (rowSelector + 1, redTeam[rowSelector][0]),
+                                            )
+                            except Exception as e:
+                                print(f"An error occurred while inserting into the database: {e}")
                     if teamSelector == "green":
                         if inputMode == 0:
                             greenTeam[rowSelector][0] = keyInput
@@ -257,9 +264,12 @@ def entryScreen():
                             keyInput = ""
 
                             #Inserts Green Team values into DB
-                            curr.execute("INSERT INTO Players (id, codename) VALUES (%s, %s);", 
-                                         (rowSelector + 16, greenTeam[rowSelector][0]),
-                                         )
+                            try:
+                                curr.execute("INSERT INTO Players (id, codename) VALUES (%s, %s);", 
+                                            (rowSelector + 16, greenTeam[rowSelector][0]),
+                                            )
+                            except Exception as e:
+                                print(f"An error occurred while inserting into the database: {e}")
 
             #backspace to delete while typing
             if event.key == pygame.K_BACKSPACE:
@@ -285,7 +295,8 @@ def entryScreen():
 
         #if user closes entry window, stops the program
         if event.type == pygame.QUIT:
-            gameRunning = False
+            pygame.quit()
+            return False # This will allow us to exit the main loop in main.py and close the program gracefully.
 
     # Network Popup Drawing:
     if networkPopup:
@@ -298,18 +309,4 @@ def entryScreen():
     #updates the screen
     pygame.display.flip()
     
-# Actual Program Loop:
-while gameRunning:
-    if counter < 1500:
-        #display Splash Screen
-        counter += 1
-        gameScreen.blit(logo, (0, 0)) # Adjusted to top left corner to fit logo across entire screen.
-        pygame.display.flip()
-    else:
-        entryScreen()
-
-# Closing Statements:
-curr.close()
-conn.close()
-pygame.quit()
-sys.exit()
+    return True # This will allow us to continue the main loop in main.py and keep the program running.
