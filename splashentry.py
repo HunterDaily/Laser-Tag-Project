@@ -36,7 +36,7 @@ playerFont = pygame.font.Font(None, 25)
 rowSelector     = 0
 teamSelector    = "red"
 
-#arrays for storing player's names/equipment ID
+#arrays for storing player's userID/playerName
 redTeam     = [[None,None] for _ in range(15)]  # Initialize with 15 elements, each containing [None, None]
 greenTeam   = [[None,None] for _ in range(15)]  # Initialize with 15 elements, each containing [None, None]
 
@@ -120,7 +120,7 @@ def entryScreen(curr) -> bool:
     for numRows in range(15):
         rowsY = 75 + (numRows * 30)
             
-        #arrow selector to pick a row to put player name/equipment ID in red/green teams
+        #arrow selector to pick a row to put userID/playerName in red/green teams
         if numRows == rowSelector:
             selectArrow = columnFont.render(">>", True, whiteText)
             if teamSelector == "red":
@@ -137,42 +137,42 @@ def entryScreen(curr) -> bool:
         pygame.draw.rect(gameScreen, whiteText, (550, rowsY, 120, 25))
         pygame.draw.rect(gameScreen, whiteText, (675, rowsY, 180, 25))
 
-        #displays the player names/equipment ID for red/green teams
-        #Red Team names/equipment ID
+        #displays the userID/playerName for red/green teams
+        #Red Team userID/playerName
         if redTeam[numRows][0] is not None:
             if not (numRows == rowSelector and teamSelector == "red" and typingCheck == True and inputMode == 0):
-                playerName = playerFont.render(str(redTeam[numRows][0]), True, blackRGB)
-                gameScreen.blit(playerName, (180, rowsY + 5))
+                userID = playerFont.render(str(redTeam[numRows][0]), True, blackRGB)
+                gameScreen.blit(userID, (180, rowsY + 5))
         if redTeam[numRows][1] is not None:
             if not (numRows == rowSelector and teamSelector == "red" and typingCheck == True and inputMode == 1):
-                equipID = playerFont.render(str(redTeam[numRows][1]), True, blackRGB)
-                gameScreen.blit(equipID, (305, rowsY + 5))
-        #Green Team names/equipment ID
+                playerName = playerFont.render(str(redTeam[numRows][1]), True, blackRGB)
+                gameScreen.blit(playerName, (305, rowsY + 5))
+        #Green Team userID/playerName
         if greenTeam[numRows][0] is not None:
             if not (numRows == rowSelector and teamSelector == "green" and typingCheck == True and inputMode == 0):
-                playerName = playerFont.render(str(greenTeam[numRows][0]), True, blackRGB)
-                gameScreen.blit(playerName, (555, rowsY + 5))
+                userID = playerFont.render(str(greenTeam[numRows][0]), True, blackRGB)
+                gameScreen.blit(userID, (555, rowsY + 5))
         if greenTeam[numRows][1] is not None:
             if not (numRows == rowSelector and teamSelector == "green" and typingCheck == True and inputMode == 1):
-                equipID = playerFont.render(str(greenTeam[numRows][1]), True, blackRGB)
-                gameScreen.blit(equipID, (680, rowsY + 5))
+                playerName = playerFont.render(str(greenTeam[numRows][1]), True, blackRGB)
+                gameScreen.blit(playerName, (680, rowsY + 5))
             
-        #displays players names/equipment ID while being typed
+        #displays userID/playerName while being typed
         if numRows == rowSelector and typingCheck == True:
             if teamSelector == "red":
                 if inputMode == 0:
-                    playerName = playerFont.render(keyInput, True, blackRGB)
-                    gameScreen.blit(playerName, (180, rowsY + 5))
+                    userID = playerFont.render(keyInput, True, blackRGB)
+                    gameScreen.blit(userID, (180, rowsY + 5))
                 elif inputMode == 1:
-                    equipID = playerFont.render(keyInput, True, blackRGB)
-                    gameScreen.blit(equipID, (305, rowsY + 5))
+                    playerName = playerFont.render(keyInput, True, blackRGB)
+                    gameScreen.blit(playerName, (305, rowsY + 5))
             elif teamSelector == "green":
                 if inputMode == 0:
-                    playerName = playerFont.render(keyInput, True, blackRGB)
-                    gameScreen.blit(playerName, (555, rowsY + 5))
+                    userID = playerFont.render(keyInput, True, blackRGB)
+                    gameScreen.blit(userID, (555, rowsY + 5))
                 elif inputMode == 1:
-                    equipID = playerFont.render(keyInput, True, blackRGB)
-                    gameScreen.blit(equipID, (680, rowsY + 5))
+                    playerName = playerFont.render(keyInput, True, blackRGB)
+                    gameScreen.blit(playerName, (680, rowsY + 5))
 
 
     #checks for key events or closing window
