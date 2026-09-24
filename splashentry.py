@@ -75,9 +75,9 @@ def fill_from_database(curr):
     curr.execute("SELECT * FROM Players;")
     for Row in curr.fetchall():
         if 1 <= Row[0] <= len(redTeam):
-            redTeam[Row[0]-1] = [Row[1], None]
+            redTeam[Row[0]-1] = [None, Row[1]]
         elif len(redTeam) <= Row[0] <= (len(redTeam) + len(greenTeam)):
-            greenTeam[Row[0]-16] = [Row[1], None]
+            greenTeam[Row[0]-16] = [None, Row[1]]
 
 # Display splash screen
 def splashScreen():
@@ -234,9 +234,10 @@ def entryScreen(curr) -> bool:
                 else:
                     if teamSelector == "red":
                         if inputMode == 0:
-                            redTeam[rowSelector][0] = keyInput
-                            inputMode = 1
-                            keyInput = ""
+                            if keyInput:
+                                redTeam[rowSelector][0] = keyInput
+                                inputMode = 1
+                                keyInput = ""
                         elif inputMode == 1:
                             redTeam[rowSelector][1] = keyInput
                             inputMode = 0
@@ -246,16 +247,18 @@ def entryScreen(curr) -> bool:
 
                             #Inserts Red Team values into DB
                             try:
-                                curr.execute("INSERT INTO Players (id, codename) VALUES (%s, %s);", 
-                                            (rowSelector + 1, redTeam[rowSelector][0]),
-                                            )
+                                curr.execute(
+                                    "INSERT INTO Players (id, codename) VALUES (%s, %s) ",
+                                    (rowSelector + 1, redTeam[rowSelector][1]),
+                                )
                             except Exception as e:
                                 print(f"An error occurred while inserting into the database: {e}")
                     if teamSelector == "green":
                         if inputMode == 0:
-                            greenTeam[rowSelector][0] = keyInput
-                            inputMode = 1
-                            keyInput = ""
+                            if keyInput:
+                                greenTeam[rowSelector][0] = keyInput
+                                inputMode = 1
+                                keyInput = ""
                         elif inputMode == 1:
                             greenTeam[rowSelector][1] = keyInput
                             inputMode = 0
@@ -265,9 +268,10 @@ def entryScreen(curr) -> bool:
 
                             #Inserts Green Team values into DB
                             try:
-                                curr.execute("INSERT INTO Players (id, codename) VALUES (%s, %s);", 
-                                            (rowSelector + 16, greenTeam[rowSelector][0]),
-                                            )
+                                curr.execute(
+                                    "INSERT INTO Players (id, codename) VALUES (%s, %s) ",
+                                    (rowSelector + 16, greenTeam[rowSelector][1]),
+                                )
                             except Exception as e:
                                 print(f"An error occurred while inserting into the database: {e}")
 
@@ -286,9 +290,9 @@ def entryScreen(curr) -> bool:
                 if event.text.isdigit(): # Only digits for equipment ID.
                     keyInput += event.text
             elif typingCheck == True:
-                if inputMode == 0:
+                if inputMode == 1:
                     keyInput += event.text
-                elif inputMode == 1:
+                elif inputMode == 0:
                     #makes sure that the user can only input numbers for player ID
                     if event.text.isdigit():
                         keyInput += event.text
