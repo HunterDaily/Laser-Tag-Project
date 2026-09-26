@@ -6,6 +6,11 @@ Ensure that [psycopg](https://www.psycopg.org/) and [pygame](https://www.pygame.
 ./install.sh
 ```
 
+## Controls
+* Use the arrow keys to navigate the player entry screen.
+* Press Tab to edit player data.
+* Press F1 to toggle network address editing.
+* 
 ## Credits  
 |      Name      |    Username    |
 | -------------- | -------------- |
