@@ -224,8 +224,9 @@ def entryScreen(curr) -> bool:
                         # Broadcast Equipment ID:
                         network.broadcast(keyInput) # Later on we should be validate this ID and save it to a table matched with player ID.                
                         equipmentPopup = False # Closing up popup.
+                        inputMode = 1 # Return to name entering mode.
                         keyInput = ""
-                        pygame.key.stop_text_input()
+                        pygame.key.start_text_input()
                 elif typingCheck == False:
                     #starts editing for selected player
                     typingCheck = True
@@ -236,13 +237,13 @@ def entryScreen(curr) -> bool:
                         if inputMode == 0:
                             if keyInput:
                                 redTeam[rowSelector][0] = keyInput
-                                inputMode = 1
+                                inputMode = 2
                                 keyInput = ""
+                                equipmentPopup = True # "After player id number has been entered, system will prompt for the equipment id that the player is using"
                         elif inputMode == 1:
                             redTeam[rowSelector][1] = keyInput
                             inputMode = 0
                             typingCheck = False
-                            equipmentPopup = True # "After player id number has been entered, system will prompt for the equipment id that the player is using"
                             keyInput = ""
 
                             #Inserts Red Team values into DB
@@ -253,17 +254,20 @@ def entryScreen(curr) -> bool:
                                 )
                             except Exception as e:
                                 print(f"An error occurred while inserting into the database: {e}")
+                        elif inputMode == 2:
+                            pass
+
                     if teamSelector == "green":
                         if inputMode == 0:
                             if keyInput:
                                 greenTeam[rowSelector][0] = keyInput
-                                inputMode = 1
+                                inputMode = 2
                                 keyInput = ""
+                                equipmentPopup = True # "After player id number has been entered, system will prompt for the equipment id that the player is using"
                         elif inputMode == 1:
                             greenTeam[rowSelector][1] = keyInput
                             inputMode = 0
                             typingCheck = False
-                            equipmentPopup = True # "After player id number has been entered, system will prompt for the equipment id that the player is using"
                             keyInput = ""
 
                             #Inserts Green Team values into DB
@@ -274,6 +278,8 @@ def entryScreen(curr) -> bool:
                                 )
                             except Exception as e:
                                 print(f"An error occurred while inserting into the database: {e}")
+                        elif inputMode == 2:
+                             pass
 
             #backspace to delete while typing
             if event.key == pygame.K_BACKSPACE:
