@@ -44,6 +44,7 @@ greenTeam   = [[None,None] for _ in range(15)]  # Initialize with 15 elements, e
 typingCheck = False
 keyInput    = ""
 inputMode   = 0
+existingPlayer = False
 
 # Popup function to draw network & later other popups:
 def draw_popup(input_text, description):
@@ -88,7 +89,7 @@ pygame.display.set_caption("Entry Terminal")
 
 def entryScreen(curr) -> bool:
     global rowSelector, teamSelector, typingCheck, keyInput, inputMode, redTeam, greenTeam # Original player entry variables.
-    global networkPopup, networkAddress, equipmentPopup # Network and equipment popup variables.
+    global networkPopup, networkAddress, equipmentPopup, existingPlayer # Network and equipment popup variables.
 
     #background color
     gameScreen.fill(blackRGB)
@@ -214,9 +215,16 @@ def entryScreen(curr) -> bool:
                         # Broadcast Equipment ID:
                         network.broadcast(keyInput) # Later on we should be validate this ID and save it to a table matched with player ID.                
                         equipmentPopup = False # Closing up popup.
-                        inputMode = 1 # Return to name entering mode.
                         keyInput = ""
                         pygame.key.start_text_input()
+                        #If player exists in DB, don't prompt user for new codename.
+                        if existingPlayer:
+                            typingCheck = False
+                            inputMode = 0
+                            existingPlayer = False
+                        else:
+                            inputMode = 1 # Return to name entering mode.
+
                 elif typingCheck == False:
                     #starts editing for selected player
                     typingCheck = True
@@ -224,12 +232,26 @@ def entryScreen(curr) -> bool:
                     pygame.key.start_text_input()
                 else:
                     if teamSelector == "red":
+                        tempID = 0 #Stores ID to be checked in DB
                         if inputMode == 0:
                             if keyInput:
                                 redTeam[rowSelector][0] = keyInput
+                                tempID = int(keyInput.strip())
                                 inputMode = 2
                                 keyInput = ""
                                 equipmentPopup = True # "After player id number has been entered, system will prompt for the equipment id that the player is using"
+                                try:
+                                    #Find all ids in the DB and see if id is in it
+                                    curr.execute("SELECT id FROM Players;")
+                                    ids = curr.fetchall()
+                                    if ((tempID,) in ids):
+                                        curr.execute(f"SELECT codename FROM Players WHERE id = {tempID};")
+                                        redTeam[rowSelector][1] = curr.fetchone()[0]
+                                        existingPlayer = True
+                                    else:
+                                        existingPlayer = False
+                                except Exception as e:
+                                    print(f"An error occurred while inserting into the database: {e}")
                         elif inputMode == 1:
                             redTeam[rowSelector][1] = keyInput
                             inputMode = 0
