@@ -243,8 +243,8 @@ def entryScreen(curr) -> bool:
                                 try:
                                     #Find all ids in the DB and see if id is in it
                                     curr.execute("SELECT id FROM Players;")
-                                    ids = curr.fetchall()
-                                    if ((tempID,) in ids):
+                                    DBids = curr.fetchall()
+                                    if ((tempID,) in DBids):
                                         curr.execute(f"SELECT codename FROM Players WHERE id = {tempID};")
                                         redTeam[rowSelector][1] = curr.fetchone()[0]
                                         existingPlayer = True
@@ -270,12 +270,26 @@ def entryScreen(curr) -> bool:
                             pass
 
                     if teamSelector == "green":
+                        tempID = 0
                         if inputMode == 0:
                             if keyInput:
                                 greenTeam[rowSelector][0] = keyInput
+                                tempID = int(keyInput.strip())
                                 inputMode = 2
                                 keyInput = ""
                                 equipmentPopup = True # "After player id number has been entered, system will prompt for the equipment id that the player is using"
+                                try:
+                                    #Find all ids in the DB and see if id is in it
+                                    curr.execute("SELECT id FROM Players;")
+                                    DBids = curr.fetchall()
+                                    if ((tempID,) in DBids):
+                                        curr.execute(f"SELECT codename FROM Players WHERE id = {tempID};")
+                                        greenTeam[rowSelector][1] = curr.fetchone()[0]
+                                        existingPlayer = True
+                                    else:
+                                        existingPlayer = False
+                                except Exception as e:
+                                    print(f"An error occurred while inserting into the database: {e}")
                         elif inputMode == 1:
                             greenTeam[rowSelector][1] = keyInput
                             inputMode = 0
