@@ -69,16 +69,6 @@ def connect_to_database():
         print(f"An error occurred: {e}")
         sys.exit(1)  # Exit the program if the database connection fails
 
-# Imports rows from database
-def fill_from_database(curr):
-    global redTeam, greenTeam
-    curr.execute("SELECT * FROM Players;")
-    for Row in curr.fetchall():
-        if 1 <= Row[0] <= len(redTeam):
-            redTeam[Row[0]-1] = [None, Row[1]]
-        elif len(redTeam) <= Row[0] <= (len(redTeam) + len(greenTeam)):
-            greenTeam[Row[0]-16] = [None, Row[1]]
-
 # Display splash screen
 def splashScreen():
     #logo = pygame.image.load("photon-main\logo.jpg") #Use on Windows machines
@@ -250,7 +240,7 @@ def entryScreen(curr) -> bool:
                             try:
                                 curr.execute(
                                     "INSERT INTO Players (id, codename) VALUES (%s, %s) ",
-                                    (rowSelector + 1, redTeam[rowSelector][1]),
+                                    (redTeam[rowSelector][0], redTeam[rowSelector][1]),
                                 )
                             except Exception as e:
                                 print(f"An error occurred while inserting into the database: {e}")
@@ -274,7 +264,7 @@ def entryScreen(curr) -> bool:
                             try:
                                 curr.execute(
                                     "INSERT INTO Players (id, codename) VALUES (%s, %s) ",
-                                    (rowSelector + 16, greenTeam[rowSelector][1]),
+                                    (greenTeam[rowSelector][0], greenTeam[rowSelector][1]),
                                 )
                             except Exception as e:
                                 print(f"An error occurred while inserting into the database: {e}")
