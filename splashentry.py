@@ -25,6 +25,7 @@ blueTitle       = (102, 102, 255)
 redBack         = (60, 0, 0)
 greenBack       = (0, 60, 0)
 whiteText       = (255, 255, 255)
+yellowBox       = (255, 239, 0)
 
 #fonts for the entry screen
 titleFont = pygame.font.Font(None, 30)
@@ -86,6 +87,37 @@ def splashScreen():
         gameScreen.blit(logo, (0, 0)) # Adjusted to top left corner to fit logo across entire screen.
         pygame.display.flip()
 
+# Display game countdown timer
+def countDown():
+    # Starts a countdown timer
+    counter = 30
+    startTime = pygame.time.get_ticks()
+    
+    while counter >= 0:
+        #keeps track of time for the countdown images
+        currentTime = pygame.time.get_ticks()
+        timePassed = (currentTime - startTime) // 1000
+        counter = 30 - timePassed
+
+        if counter < 0:
+            counter = 0
+
+        #countdownImage = pygame.image.load("photon-main\countdown_images\countdown" + str(counter) + ".jpg") #Use on Window Machines
+        countdownImage = pygame.image.load("photon-main/countdown_images/countdown" + str(counter) + ".jpg") #Use on Linux Machines
+        countdownImage = pygame.transform.scale(countdownImage, (1000, 625))
+        
+        #displays the countdown timer
+        pygame.event.pump()
+        gameScreen.blit(countdownImage, (0, 0)) 
+        pygame.display.flip()
+
+        if counter == 0:
+            break
+
+    #broadcast code 202 section (note: not sure if I did the broadcast correctly):
+    network.broadcast("202")
+
+
 #entry screen window using the window size variable
 gameScreen = pygame.display.set_mode((windowWidth, windowHeight))
 pygame.display.set_caption("Entry Terminal")
@@ -122,14 +154,34 @@ def entryScreen(curr) -> bool:
             elif teamSelector == "green":
                 gameScreen.blit(selectArrow, (495, rowsY))
         playerNumber = columnFont.render(str(numRows+1), True, whiteText)
+ 
+        #variables to check which box of the table is being edited/inserted
+        redID       = whiteText
+        redName     = whiteText
+        greenID     = whiteText
+        greenName   = whiteText
+
+        #changes the corresponding insert box to yellow/highlighted
+        if numRows == rowSelector and typingCheck == True:
+            if teamSelector == "red":
+                if inputMode == 0:
+                    redID       = yellowBox
+                elif inputMode == 1:
+                    redName     = yellowBox
+            elif teamSelector == "green":
+                if inputMode == 0:
+                    greenID     = yellowBox
+                elif inputMode == 1:
+                    greenName   = yellowBox
+
         #red team table
         gameScreen.blit(playerNumber, (145, rowsY))
-        pygame.draw.rect(gameScreen, whiteText, (175, rowsY, 120, 25))
-        pygame.draw.rect(gameScreen, whiteText, (300, rowsY, 180, 25))
+        pygame.draw.rect(gameScreen, redID, (175, rowsY, 120, 25))
+        pygame.draw.rect(gameScreen, redName, (300, rowsY, 180, 25))
         #green team table
         gameScreen.blit(playerNumber, (520, rowsY))
-        pygame.draw.rect(gameScreen, whiteText, (550, rowsY, 120, 25))
-        pygame.draw.rect(gameScreen, whiteText, (675, rowsY, 180, 25))
+        pygame.draw.rect(gameScreen, greenID, (550, rowsY, 120, 25))
+        pygame.draw.rect(gameScreen, greenName, (675, rowsY, 180, 25))
 
         #displays the userID/playerName for red/green teams
         #Red Team userID/playerName
