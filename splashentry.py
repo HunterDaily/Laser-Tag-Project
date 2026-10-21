@@ -394,7 +394,7 @@ def entryScreen(curr) -> bool:
                     #makes sure that the user can only input numbers for player ID
                     if event.text.isdigit():
                         keyInput += event.text
-        if event.type == pygame.K_f12:
+        if event.type == pygame.K_F12:
             #Clears the player entry screen and resets all variables to default values
             redTeam = [[None,None] for _ in range(15)]
             greenTeam = [[None,None] for _ in range(15)]
