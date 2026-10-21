@@ -63,6 +63,15 @@ def draw_popup(input_text, description):
     input_text_render = playerFont.render(input_text, True, blackRGB)
     gameScreen.blit(input_text_render, (260, 250))
 
+    # Small message on the bottom left for the broadcast/equipmentID
+    # To show "f1/tab" to go back into the player entry window.
+    if networkPopup == True:
+        goBack = playerFont.render("Push (F1) to go back", True, whiteText)
+        gameScreen.blit(goBack, (260, 395))
+    elif equipmentPopup == True:
+        goBack = playerFont.render("Push (tab) to go back", True, whiteText)
+        gameScreen.blit(goBack, (260, 395))
+
 # Connect to database
 def connect_to_database():
     try:
