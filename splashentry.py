@@ -403,10 +403,16 @@ def entryScreen(curr) -> bool:
                     #makes sure that the user can only input numbers for player ID
                     if event.text.isdigit():
                         keyInput += event.text
-        if event.type == pygame.K_F12:
-            #Clears the player entry screen and resets all variables to default values
-            redTeam = [[None,None] for _ in range(15)]
-            greenTeam = [[None,None] for _ in range(15)]
+        if event.key == pygame.K_F12 and not typingCheck and not networkPopup and not equipmentPopup:
+            redTeam = [[None, None] for _ in range(15)]
+            greenTeam = [[None, None] for _ in range(15)]
+            
+            usedIDs.clear()
+            rowSelector = 0
+            teamSelector = "red"
+            inputMode = 0
+            keyInput = ""
+            existingPlayer = False
             
         #if user closes entry window, stops the program
         if event.type == pygame.QUIT:
