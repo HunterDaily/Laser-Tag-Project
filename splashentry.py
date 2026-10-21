@@ -40,6 +40,7 @@ teamSelector    = "red"
 #arrays for storing player's userID/playerName
 redTeam     = [[None,None] for _ in range(15)]  # Initialize with 15 elements, each containing [None, None]
 greenTeam   = [[None,None] for _ in range(15)]  # Initialize with 15 elements, each containing [None, None]
+# should expand saved data to 3-tuplets to include equipment ID, but for now we will just use 2-tuplets for userID/playerName.
 
 #typing variables
 typingCheck = False
@@ -99,29 +100,32 @@ def splashScreen():
 # Display game countdown timer
 def countDown():
     # Starts a countdown timer
-    counter = 30
+    clock = pygame.time.Clock()
     startTime = pygame.time.get_ticks()
+    last_counter = None
     
-    while counter >= 0:
+    while True:
         #keeps track of time for the countdown images
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
         currentTime = pygame.time.get_ticks()
         timePassed = (currentTime - startTime) // 1000
         counter = 30 - timePassed
 
         if counter < 0:
-            counter = 0
-
-        #countdownImage = pygame.image.load("photon-main\countdown_images\countdown" + str(counter) + ".jpg") #Use on Window Machines
-        countdownImage = pygame.image.load("photon-main/countdown_images/countdown" + str(counter) + ".jpg") #Use on Linux Machines
-        countdownImage = pygame.transform.scale(countdownImage, (1000, 625))
-        
-        #displays the countdown timer
-        pygame.event.pump()
-        gameScreen.blit(countdownImage, (0, 0)) 
-        pygame.display.flip()
-
-        if counter == 0:
             break
+
+        if counter != last_counter:
+            last_counter = counter
+            #countdownImage = pygame.image.load("photon-main\countdown_images\countdown" + str(counter) + ".jpg") #Use on Window Machines
+            countdownImage = pygame.image.load("photon-main/countdown_images/countdown" + str(counter) + ".jpg") #Use on Linux Machines
+            countdownImage = pygame.transform.scale(countdownImage, (1000, 625))
+            gameScreen.blit(countdownImage, (0, 0)) 
+            pygame.display.flip()
+        
+        clock.tick(30)
 
     #broadcast code 202 section (note: not sure if I did the broadcast correctly):
     network.broadcast("202")
@@ -252,6 +256,10 @@ def entryScreen(curr) -> bool:
                         networkAddress = networkDefault # Resetting to default when invalid.
                     networkPopup = False
                     pygame.key.stop_text_input()
+            
+            if event.key == pygame.K_F5 and not typingCheck and not equipmentPopup and not networkPopup: # F5 is the key to start the game, but we don't want it to be pressed while typing or in a popup.
+                countDown() # Calls the countdown function to start the game.
+                return False # This will allow us to exit the main loop in main.py and close the program gracefully.
 
             if typingCheck == False and networkPopup == False and equipmentPopup == False: # Conditionals to lock the popup.
                 #team switching
@@ -419,7 +427,7 @@ def entryScreen(curr) -> bool:
         #if user closes entry window, stops the program
         if event.type == pygame.QUIT:
             pygame.quit()
-            return False # This will allow us to exit the main loop in main.py and close the program gracefully.
+            sys.exit()
 
     # Network Popup Drawing:
     if networkPopup:
