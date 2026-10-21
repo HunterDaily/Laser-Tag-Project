@@ -403,7 +403,7 @@ def entryScreen(curr) -> bool:
                     #makes sure that the user can only input numbers for player ID
                     if event.text.isdigit():
                         keyInput += event.text
-        if event.key == pygame.K_F12 and not typingCheck and not networkPopup and not equipmentPopup:
+        if event.key == pygame.K_F12:
             redTeam = [[None, None] for _ in range(15)]
             greenTeam = [[None, None] for _ in range(15)]
             
