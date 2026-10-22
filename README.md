@@ -10,6 +10,8 @@ Ensure that [psycopg](https://www.psycopg.org/) and [pygame](https://www.pygame.
 * Use the arrow keys to navigate the player entry screen.
 * Press Tab to edit player data.
 * Press F1 to toggle network address editing.
+* Press F5 to start the 30 second countdown and begin the game.
+* Press F12 to clear all players in the entry screen.
 
 ## Credits  
 |      Name      |    Username    |
