@@ -2,6 +2,7 @@ import pygame
 import sys
 import psycopg # type: ignore -> Just so we don't have constantly get an import warning.
 from SocketManager import SocketManager # Custom networking class.
+import MusicManager # Custom music manager class.
 
 # Initialize socket manager
 network = SocketManager()
@@ -103,6 +104,7 @@ def countDown():
     clock = pygame.time.Clock()
     startTime = pygame.time.get_ticks()
     last_counter = None
+    music_started = False
     
     while True:
         #keeps track of time for the countdown images
@@ -113,6 +115,10 @@ def countDown():
         currentTime = pygame.time.get_ticks()
         timePassed = (currentTime - startTime) // 1000
         counter = 30 - timePassed
+
+        if timePassed >= 13 and not music_started:
+            MusicManager.start_track() # Start playing music synced to countdown.
+            music_started = True
 
         if counter < 0:
             break
