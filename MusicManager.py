@@ -12,7 +12,7 @@ def start_track(): # Randomly picks a track to play from the music folder.
 
     track = random.choice(tracks) # Picking our randomly selected track.
     pygame.mixer.music.load(str(track))
-    pygame.mixer.music.set_volume(0.7) # Tunable volume because the normal 1.0 was blaring.
+    pygame.mixer.music.set_volume(0.4) # Tunable volume because the normal 1.0 was blaring.
     pygame.mixer.music.play() # Load then play the track file.
 
     # print(f"Now playing: {track.name}") # Print the name of the track to the console.

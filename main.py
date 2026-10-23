@@ -17,7 +17,7 @@ while game_action:
     game_action = playaction.playAction(splashentry.network, splashentry.redTeam, splashentry.greenTeam)
 
 # Wait for the music track to end:
-MusicManager.wait_until_finished()
+MusicManager.wait_for_track_finished()
 
 # Only close everything after the music ends
 curr.close()
