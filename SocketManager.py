@@ -17,8 +17,11 @@ class SocketManager: # Tiny class built to make network swapping easy and offeri
     def receive(self): # Wrapper function for receiving data.
         return self.receiver.receive_data()
 
-    def broadcast(self, equipment_id): # Wrapper function for sending data.
+    def broadcast_equipment(self, equipment_id): # Wrapper function for sending data.
         self.broadcaster.broadcast_equipment_code(equipment_id)
+    
+    def broadcast_game(self, game_code): # Wrapper function for sending data.
+        self.broadcaster.broadcast_game_code(game_code)
 
     def validate_network(self, target_address): # Makes sure that the entered address is possible.
         # Divide into 4 parts:

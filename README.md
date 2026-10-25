@@ -13,6 +13,10 @@ Ensure that [psycopg](https://www.psycopg.org/) and [pygame](https://www.pygame.
 * Press F5 to start the 30 second countdown and begin the game.
 * Press F12 to clear all players in the entry screen.
 
+## Notes
+* Input fields will be highlighted yellow when active.
+* If an input requires multiple steps, push the same button used to enter the process to progress it.
+
 ## Credits  
 |      Name      |    Username    |
 | -------------- | -------------- |

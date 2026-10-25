@@ -39,9 +39,8 @@ rowSelector     = 0
 teamSelector    = "red"
 
 #arrays for storing player's userID/playerName
-redTeam     = [[None,None] for _ in range(15)]  # Initialize with 15 elements, each containing [None, None]
-greenTeam   = [[None,None] for _ in range(15)]  # Initialize with 15 elements, each containing [None, None]
-# should expand saved data to 3-tuplets to include equipment ID, but for now we will just use 2-tuplets for userID/playerName.
+redTeam     = [[None,None,None] for _ in range(15)]  # Initialize with 15 elements, each containing [id, name, equipment]
+greenTeam   = [[None,None,None] for _ in range(15)]  # Initialize with 15 elements, each containing [id, name, equipment]
 
 #typing variables
 typingCheck = False
@@ -60,7 +59,7 @@ def draw_popup(input_text, description):
     prompt = playerFont.render(description, True, blueTitle)
     gameScreen.blit(prompt, (260, 210))
     # Input Box:
-    pygame.draw.rect(gameScreen, whiteText, (260, 250, 480, 30))
+    pygame.draw.rect(gameScreen, yellowBox, (260, 250, 480, 30))
     # Input Text:
     input_text_render = playerFont.render(input_text, True, blackRGB)
     gameScreen.blit(input_text_render, (260, 250))
@@ -134,7 +133,7 @@ def countDown():
         clock.tick(30)
 
     #broadcast code 202 section (note: not sure if I did the broadcast correctly):
-    network.broadcast("202")
+    network.broadcast_game("202")
 
 
 #entry screen window using the window size variable
@@ -290,8 +289,14 @@ def entryScreen(curr) -> bool:
             if event.key == pygame.K_TAB and networkPopup == False: # Conditional to lock the popup.
                 if equipmentPopup:
                     if keyInput: # Error handling for empty input.
+                        # Save equipment ID to the selected team at the current row
+                        if teamSelector == "red":
+                            redTeam[rowSelector][2] = keyInput
+                        elif teamSelector == "green":
+                            greenTeam[rowSelector][2] = keyInput
+                            
                         # Broadcast Equipment ID:
-                        network.broadcast(keyInput) # Later on we should be validate this ID and save it to a table matched with player ID.                
+                        network.broadcast_equipment(keyInput) # Later on we should be validate this ID and save it to a table matched with player ID.                
                         equipmentPopup = False # Closing up popup.
                         keyInput = ""
                         pygame.key.start_text_input()
@@ -404,9 +409,9 @@ def entryScreen(curr) -> bool:
                     keyInput = keyInput[:-1]
 
             if event.key == pygame.K_F12:
-                redTeam = [[None, None] for _ in range(15)]
-                greenTeam = [[None, None] for _ in range(15)]
-                
+                redTeam = [[None, None, None] for _ in range(15)]
+                greenTeam = [[None, None, None] for _ in range(15)]
+
                 usedIDs.clear()
                 rowSelector = 0
                 teamSelector = "red"

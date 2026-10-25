@@ -15,6 +15,14 @@ class Broadcast:
             print(f"Broadcasted equipment code {equipment_id} to {self.broadcast_ip}:{self.broadcast_port}")
         except Exception as e:
             print(f"Error occurred while broadcasting equipment code {equipment_id}: {e}")
+            
+    def broadcast_game_code(self, game_code):
+        message = game_code.encode('utf-8')
+        try:
+            self.sock.sendto(message, (self.broadcast_ip, self.broadcast_port))
+            print(f"Broadcasted game code {game_code} to {self.broadcast_ip}:{self.broadcast_port}")
+        except Exception as e:
+            print(f"Error occurred while broadcasting game code {game_code}: {e}")
     
     def close(self):
         self.sock.close()
