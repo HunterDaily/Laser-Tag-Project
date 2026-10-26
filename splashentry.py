@@ -33,6 +33,7 @@ titleFont = pygame.font.Font(None, 30)
 teamNames = pygame.font.Font(None, 25)
 columnFont = pygame.font.Font(None, 25)
 playerFont = pygame.font.Font(None, 25)
+hintFont   = pygame.font.Font(None, 20)
 
 #selecting rows/teams variables
 rowSelector     = 0
@@ -447,6 +448,16 @@ def entryScreen(curr) -> bool:
     # Equipment Popup Drawing:
     if equipmentPopup:
         draw_popup(keyInput, "Enter Equipment ID:") # Same thing as ^ but for equipment ID.
+
+    #Footer Instructions Bar
+    pygame.draw.rect(gameScreen, (30, 30, 30), (0, windowHeight - 30, windowWidth, 30))
+    
+    #Render the shortcut hints text
+    hints_text = "[F1] Network  |  [Tab] Select/Enter  |  [F5] Start Game  |  [F12] Clear Screen"
+    hints_render = hintFont.render(hints_text, True, (200, 200, 200)) # Light gray text
+    
+    #Blit centered or neatly aligned near the bottom
+    gameScreen.blit(hints_render, (20, windowHeight - 22))
     
     #updates the screen
     pygame.display.flip()
