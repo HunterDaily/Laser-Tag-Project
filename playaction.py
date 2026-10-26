@@ -134,6 +134,7 @@ def playAction(network: SocketManager, redTeam, greenTeam) -> bool:
 
     # Exit the loop in main.py.
     if remaining <= 0:
+        network.broadcast_game("221") #Stop code from "photon-main\udp_files\python_trafficgenerator readme.txt"
         return False
 
     return True
