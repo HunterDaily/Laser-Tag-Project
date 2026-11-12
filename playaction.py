@@ -37,6 +37,8 @@ TOTAL_Y     = 337  # Y of the team total score row.
 redNameX,   redScoreX   = 45, 465
 greenNameX, greenScoreX = 515, 955
 
+#Preloading base icon
+baseIcon = pygame.image.load("photon-main/baseicon.jpg")
 
 clock = pygame.time.Clock()
 startTime = None          # Set on the first call to playAction().
@@ -45,6 +47,10 @@ eventLog = []             # Empty for now (no events yet).
 actionBackground = pygame.Surface((actionBox.width - 6, actionBox.height - 6))
 gameOver = False            # Flag to indicate if the game is over.
 endBroadcastSent = False      # Flag to indicate if the end game broadcast has been sent.
+
+#arrays for storing player's userID/playerName
+redTeam     = [[None,None,None] for _ in range(15)]  # Initialize with 15 elements, each containing [id, name, equipment]
+greenTeam   = [[None,None,None] for _ in range(15)]  # Initialize with 15 elements, each containing [id, name, equipment]
 
 
 def draw_titled_box(screen, rect, title):
@@ -116,9 +122,28 @@ def handle_action(shooterID, taggedID):
     ###################################
     # ALL ACTION LOGIC SHOULD GO HERE #
     ###################################
+    if (shooterID in redTeam and taggedID in redTeam) or (shooterID in greenTeam and taggedID in greenTeam):
+        playerScores[shooterID] -= 10
+        playerScores[taggedID] -= 10
+        eventLog.append(f"{redTeam[shooterID]} friendly fired {redTeam[taggedID]}")
+    elif (shooterID in greenTeam and taggedID == 53):
+        playerScores[shooterID] += 100
+        # add base icon
+        eventLog.append(f"")
+    elif (shooterID in redTeam and taggedID == 43):
+        playerScores[shooterID] += 100
+        # add base icon
+        eventLog.append(f"")
+    else:
+        playerScores[shooterID] += 10
+        eventLog.append(f"")
+ 
 
-def playAction(network: SocketManager, redTeam, greenTeam) -> int:
+def playAction(network: SocketManager, red, green) -> int:
+    redTeam = red
+    greenTeam = green
     global startTime, actionBackground, gameOver, endBroadcastSent
+
     screen = pygame.display.get_surface()
 
     # First frame setup
