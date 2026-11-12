@@ -1,6 +1,6 @@
-import pygame
+import pygame # type: ignore -> Just so we don't have constantly get an import warning.
 import sys
-import psycopg # type: ignore -> Just so we don't have constantly get an import warning.
+import psycopg # type: ignore
 from SocketManager import SocketManager # Custom networking class.
 
 pygame.font.init()
@@ -80,6 +80,30 @@ def format_time(seconds):
     return f"{seconds // 60}:{seconds % 60:02d}" # Makes sure that seconds is always represented by two digits so we get 6:07 instead of 6:7
 
 
+# Recieve Incoming Data:
+def recieve_action_data(network: SocketManager):
+    while True:
+        received_data = network.receive()
+        if received_data is None: # No data currently received.
+            break
+        try:
+            # Process Data:
+            shooterID, taggedID = received_data.split(":") # Splits recieved data into required IDs.
+            shooterID = int(shooterID)
+            taggedID = int(taggedID)
+            # Send Data to Action Function:
+            handle_action(shooterID, taggedID)
+        except ValueError:
+            print(f"Invalid data received: {received_data}") # This shouldn't happen but it's here just in case hardware or generator produce unexpected values.
+
+# Handle Incoming Actions:
+def handle_action(shooterID, taggedID):
+    print(f"Shooter ID: {shooterID} tagged Target ID: {taggedID}") # Example printing for recieving tests.
+
+    ###################################
+    # ALL ACTION LOGIC SHOULD GO HERE #
+    ###################################
+
 def playAction(network: SocketManager, redTeam, greenTeam) -> bool:
     global startTime, actionBackground
 
@@ -99,6 +123,9 @@ def playAction(network: SocketManager, redTeam, greenTeam) -> bool:
     # Timer
     elapsed = (pygame.time.get_ticks() - startTime) // 1000
     remaining = max(0, GAME_LENGTH - elapsed)
+
+    # Recieve Data:
+    recieve_action_data(network)
 
     # Background
     screen.fill(blackRGB)

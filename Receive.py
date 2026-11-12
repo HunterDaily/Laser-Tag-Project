@@ -7,12 +7,17 @@ class Receive:
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.sock.bind((self.receive_ip, self.receive_port))
+
+        self.sock.setblocking(False) # So we can loop recieving data during the game without stalling.
     
     def receive_data(self):
         try:
             data, addr = self.sock.recvfrom(4096)  # buffer size is 4096 bytes
-            print(f"Received data: {data.decode('utf-8')} from {addr}")
-            return data.decode('utf-8')
+            message = data.decode('utf-8').rstrip("\0")
+            print(f"Received data: {message} from {addr}")
+            return message
+        except BlockingIOError: # Just means that we're not getting any data at this time.
+            return None
         except Exception as e:
             print(f"Error occurred while receiving data: {e}")
             return None
