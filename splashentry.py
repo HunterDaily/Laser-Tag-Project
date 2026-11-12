@@ -141,7 +141,7 @@ def countDown():
 gameScreen = pygame.display.set_mode((windowWidth, windowHeight))
 pygame.display.set_caption("Entry Terminal")
 
-def entryScreen(curr) -> bool:
+def entryScreen(curr) -> int:
     global rowSelector, teamSelector, typingCheck, keyInput, inputMode, redTeam, greenTeam # Original player entry variables.
     global networkPopup, networkAddress, equipmentPopup, existingPlayer # Network and equipment popup variables.
 
@@ -264,8 +264,7 @@ def entryScreen(curr) -> bool:
                     pygame.key.stop_text_input()
             
             if event.key == pygame.K_F5 and not typingCheck and not equipmentPopup and not networkPopup: # F5 is the key to start the game, but we don't want it to be pressed while typing or in a popup.
-                countDown() # Calls the countdown function to start the game.
-                return False # This will allow us to exit the main loop in main.py and close the program gracefully.
+                return 2 # This will allow us to exit the main loop in main.py and close the program gracefully.
 
             if typingCheck == False and networkPopup == False and equipmentPopup == False: # Conditionals to lock the popup.
                 #team switching
@@ -462,4 +461,4 @@ def entryScreen(curr) -> bool:
     #updates the screen
     pygame.display.flip()
     
-    return True # This will allow us to continue the main loop in main.py and keep the program running.
+    return 1 # This will allow us to continue the main loop in main.py and keep the program running.

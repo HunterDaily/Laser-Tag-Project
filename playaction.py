@@ -22,6 +22,7 @@ boxTitleFont = pygame.font.Font(None, 34) # "Current Scores" / "Current Game Act
 playerFont = pygame.font.Font(None, 24) # Player names and scores
 timerFont = pygame.font.Font(None, 40) # Time Remaining
 actionFont = pygame.font.Font(None, 24) # Lines inside the game action window
+hintFont = pygame.font.Font(None, 20) # For post game options hints
 
 # Layout
 scoresBox = pygame.Rect(20, 25, 960, 335)
@@ -42,6 +43,8 @@ startTime = None          # Set on the first call to playAction().
 playerScores = {}         # {"playerID": score}. Nothing updates this yet, so everyone shows 0.
 eventLog = []             # Empty for now (no events yet).
 actionBackground = pygame.Surface((actionBox.width - 6, actionBox.height - 6))
+gameOver = False            # Flag to indicate if the game is over.
+endBroadcastSent = False      # Flag to indicate if the end game broadcast has been sent.
 
 
 def draw_titled_box(screen, rect, title):
@@ -80,6 +83,16 @@ def format_time(seconds):
     return f"{seconds // 60}:{seconds % 60:02d}" # Makes sure that seconds is always represented by two digits so we get 6:07 instead of 6:7
 
 
+def reset_game():
+    global startTime, playerScores, eventLog, gameOver, endBroadcastSent
+    startTime = None
+    playerScores.clear()
+    eventLog.clear()
+    gameOver = False
+    endBroadcastSent = False
+    pygame.display.set_caption("Entry Terminal")
+
+
 # Recieve Incoming Data:
 def recieve_action_data(network: SocketManager):
     while True:
@@ -104,25 +117,44 @@ def handle_action(shooterID, taggedID):
     # ALL ACTION LOGIC SHOULD GO HERE #
     ###################################
 
-def playAction(network: SocketManager, redTeam, greenTeam) -> bool:
-    global startTime, actionBackground
-
+def playAction(network: SocketManager, redTeam, greenTeam) -> int:
+    global startTime, actionBackground, gameOver, endBroadcastSent
     screen = pygame.display.get_surface()
 
     # First frame setup
     if startTime is None:
         pygame.display.set_caption("Play Action")
         startTime = pygame.time.get_ticks()
+        gameOver = False
+        endBroadcastSent = False
 
     # Events
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
-            pygame.quit()
-            sys.exit()
+            pygame.mixer.music.stop()
+            return -1  # Exit the main loop and quit the game.
+        
+        if gameOver:
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_F10:
+                    pygame.mixer.music.stop()
+                    reset_game()
+                    return 1  # Return to the entry screen without quitting the game.
+                elif event.key == pygame.K_ESCAPE:
+                    pygame.mixer.music.stop()
+                    return -1  # Exit the main loop and quit the game.
 
     # Timer
     elapsed = (pygame.time.get_ticks() - startTime) // 1000
     remaining = max(0, GAME_LENGTH - elapsed)
+    
+    if remaining <= 0:
+        remaining = 0
+        if not endBroadcastSent:
+            for _ in range(3):
+                network.broadcast_game("221")  # Stop code from "photon-main\udp_files\python_trafficgenerator readme.txt"
+            endBroadcastSent = True
+            gameOver = True  # Set the game over flag to True when time runs out.
 
     # Recieve Data:
     recieve_action_data(network)
@@ -155,14 +187,15 @@ def playAction(network: SocketManager, redTeam, greenTeam) -> bool:
     pygame.draw.rect(screen, borderYellow, timerBox, width=3)
     timerSurface = timerFont.render("Time Remaining:  " + format_time(remaining), True, whiteText)
     screen.blit(timerSurface, timerSurface.get_rect(midright=(timerBox.right - 40, timerBox.centery)))
+    
+    # Draw hints for post-game options if the game is over
+    if gameOver:
+        hints_text = "[F10] Return to Player Entry Screen  |  [ESC] Exit Game"
+        hints_render = hintFont.render(hints_text, True, (200, 200, 200)) # Light gray text
+        screen.blit(hints_render, hints_render.get_rect(midleft=(timerBox.left + 25, timerBox.centery)))
 
+    # Screen updates
     pygame.display.flip()
     clock.tick(30)
-
-    # Exit the loop in main.py.
-    if remaining <= 0:
-        for _ in range(3):
-            network.broadcast_game("221") #Stop code from "photon-main\udp_files\python_trafficgenerator readme.txt"
-        return False
-
-    return True
+    
+    return 3  # Continue the play action screen without quitting the game.
