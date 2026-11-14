@@ -23,6 +23,15 @@ class SocketManager: # Tiny class built to make network swapping easy and offeri
     def broadcast_game(self, game_code): # Wrapper function for sending data.
         self.broadcaster.broadcast_game_code(game_code)
 
+    #broadcasting codes section for sprint 4 (tagging/friendly fire):
+    #wrapper function for sending the tagged player's id
+    def broadcast_tag(self, tagged_id):
+        self.broadcaster.broadcast_tag(tagged_id)
+    
+    #wrapper function for friendly fire which should do two transmissions
+    def broadcast_friendly_fire(self, shooter_id, tagged_id):
+        self.broadcaster.broadcast_friendly_fire(shooter_id, tagged_id)
+
     def validate_network(self, target_address): # Makes sure that the entered address is possible.
         # Divide into 4 parts:
         parts = target_address.split('.')

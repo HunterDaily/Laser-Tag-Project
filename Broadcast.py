@@ -24,5 +24,15 @@ class Broadcast:
         except Exception as e:
             print(f"Error occurred while broadcasting game code {game_code}: {e}")
     
+    #broadcasting codes section for sprint 4 (tagging/friendly fire):
+    #function for broadcasting tagging other players
+    def broadcast_tag(self, tagged_id):
+        self.broadcast_equipment_code(str(tagged_id))
+    
+    #function for broadcasting friendly fire
+    def broadcast_friendly_fire(self, shooter_id, tagged_id):
+        self.broadcast_equipment_code(str(shooter_id))
+        self.broadcast_equipment_code(str(tagged_id))
+
     def close(self):
         self.sock.close()
