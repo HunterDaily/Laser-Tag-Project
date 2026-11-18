@@ -47,6 +47,7 @@ eventLog = []             # Empty for now (no events yet).
 actionBackground = pygame.Surface((actionBox.width - 6, actionBox.height - 6))
 gameOver = False            # Flag to indicate if the game is over.
 endBroadcastSent = False      # Flag to indicate if the end game broadcast has been sent.
+baseShooters = {} # Indicates whether a player has hit a base
 
 #arrays for storing player's userID/playerName
 redTeam     = [[None,None,None] for _ in range(15)]  # Initialize with 15 elements, each containing [id, name, equipment]
@@ -94,6 +95,7 @@ def reset_game():
     startTime = None
     playerScores.clear()
     eventLog.clear()
+    baseShooters.clear()
     gameOver = False
     endBroadcastSent = False
     pygame.display.set_caption("Entry Terminal")
@@ -115,28 +117,44 @@ def recieve_action_data(network: SocketManager):
         except ValueError:
             print(f"Invalid data received: {received_data}") # This shouldn't happen but it's here just in case hardware or generator produce unexpected values.
 
+# Simplifies getting player information for handle_action
+def find_player(equipmentID):
+    for teamName, team in (("red", redTeam), ("green", greenTeam)):
+        for player in team:
+            if player[2] is not None and player[2] == equipmentID:
+                return teamName, player
+    return None, None
+
 # Handle Incoming Actions:
 def handle_action(shooterID, taggedID):
     print(f"Shooter ID: {shooterID} tagged Target ID: {taggedID}") # Example printing for recieving tests.
 
-    ###################################
-    # ALL ACTION LOGIC SHOULD GO HERE #
-    ###################################
-    if (shooterID in redTeam and taggedID in redTeam) or (shooterID in greenTeam and taggedID in greenTeam):
-        playerScores[shooterID] -= 10
-        playerScores[taggedID] -= 10
-        eventLog.append(f"{redTeam[shooterID]} friendly fired {redTeam[taggedID]}")
-    elif (shooterID in greenTeam and taggedID == 53):
-        playerScores[shooterID] += 100
-        # add base icon
-        eventLog.append(f"")
-    elif (shooterID in redTeam and taggedID == 43):
-        playerScores[shooterID] += 100
-        # add base icon
-        eventLog.append(f"")
+    shooterTeam, shooter = find_player(shooterID)
+    if None in (shooterTeam, shooter):
+        return #error checking for empty shooter
+    shooterP_ID = str(shooter[0]) #Shooter's player ID
+
+    # Base hits
+    if (shooterTeam == "red") and (taggedID == 43):
+        playerScores[shooterP_ID] = playerScores.get(shooterP_ID, 0) + 100
+        baseShooters[shooterP_ID] = True
+        return
+    elif (shooterTeam == "green") and (taggedID == 53):
+        playerScores[shooterP_ID] = playerScores.get(shooterP_ID, 0) + 100
+        baseShooters[shooterP_ID] = True
+        return
+
+    taggedTeam, tagged = find_player(taggedID)
+    if None in (taggedTeam, tagged):
+            return #error checking for empty tagged
+    taggedP_ID = str(tagged[0]) #Tagged's player ID
+
+    # Friendly fire 
+    if (shooterTeam == taggedTeam):
+        playerScores[shooterP_ID] = playerScores.get(shooterP_ID, 0) - 10
+        playerScores[taggedP_ID] = playerScores.get(taggedP_ID, 0) - 10
     else:
-        playerScores[shooterID] += 10
-        eventLog.append(f"")
+        playerScores[shooterP_ID] = playerScores.get(shooterP_ID, 0) + 10
  
 
 def playAction(network: SocketManager, red, green) -> int:
