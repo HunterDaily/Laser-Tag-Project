@@ -146,7 +146,7 @@ def handle_action(network: SocketManager, shooterID, taggedID):
         baseShooters[shooterP_ID] = True
 
         eventLog.append(f"{shooterName} tagged the enemy base! (+100)")
-        #network.broadcast_tag(taggedID)
+        network.broadcast_tag(taggedID)
         
     else:
         taggedTeam, tagged = find_player(taggedID)
