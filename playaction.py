@@ -79,8 +79,10 @@ def draw_team(screen, team, nameX, scoreRightX, color):
         y = ROW_START_Y + index * ROW_HEIGHT
         highest_scorer, highest_score = get_highest_scorer()
         if (codename == highest_scorer and score == highest_score and pygame.time.get_ticks() % 1000 < 500):
-            color = (0, 0, 0) # Highlight the highest scorer in black text.
-        nameSurface = playerFont.render(codename, True, color)
+            temp_color = (0, 0, 0) # Highlight the highest scorer in black text.
+            nameSurface = playerFont.render(codename, True, temp_color)
+        else:
+            nameSurface = playerFont.render(codename, True, color)
         scoreSurface = playerFont.render(str(score), True, color)
         screen.blit(nameSurface, (nameX, y))
         screen.blit(scoreSurface, scoreSurface.get_rect(topright=(scoreRightX, y)))
