@@ -7,7 +7,7 @@ pygame.font.init()
 
 GAME_MINUTES = 6
 GAME_LENGTH = GAME_MINUTES * 60 # Game length in seconds 
-
+MAX_EVENT_LOG = 7 #Total messages that'll ever be shown in event log
 # Colors
 blackRGB     = (0, 0, 0)
 whiteText    = (255, 255, 255)
@@ -49,6 +49,7 @@ actionBackground = pygame.Surface((actionBox.width - 6, actionBox.height - 6))
 gameOver = False            # Flag to indicate if the game is over.
 endBroadcastSent = False      # Flag to indicate if the end game broadcast has been sent.
 baseShooters = {} # Indicates whether a player has hit a base
+
 
 #arrays for storing player's userID/playerName
 redTeam     = [[None,None,None] for _ in range(15)]  # Initialize with 15 elements, each containing [id, name, equipment]
@@ -130,36 +131,48 @@ def find_player(equipmentID):
 
 # Handle Incoming Actions:
 def handle_action(shooterID, taggedID):
-    print(f"Shooter ID: {shooterID} tagged Target ID: {taggedID}") # Example printing for recieving tests.
-
     shooterTeam, shooter = find_player(shooterID)
     if None in (shooterTeam, shooter):
-        return #error checking for empty shooter
-    shooterP_ID = str(shooter[0]) #Shooter's player ID
+        return
+
+    shooterP_ID = str(shooter[0])
+    shooterName = shooter[1]
 
     # Base hits
-    if (shooterTeam == "red") and (taggedID == 43):
+    if (shooterTeam == "red" and taggedID == 43) or \
+       (shooterTeam == "green" and taggedID == 53):
+
         playerScores[shooterP_ID] = playerScores.get(shooterP_ID, 0) + 100
         baseShooters[shooterP_ID] = True
-        return
-    elif (shooterTeam == "green") and (taggedID == 53):
-        playerScores[shooterP_ID] = playerScores.get(shooterP_ID, 0) + 100
-        baseShooters[shooterP_ID] = True
-        return
 
-    taggedTeam, tagged = find_player(taggedID)
-    if None in (taggedTeam, tagged):
-            return #error checking for empty tagged
-    taggedP_ID = str(tagged[0]) #Tagged's player ID
-
-    # Friendly fire 
-    if (shooterTeam == taggedTeam):
-        playerScores[shooterP_ID] = playerScores.get(shooterP_ID, 0) - 10
-        playerScores[taggedP_ID] = playerScores.get(taggedP_ID, 0) - 10
-        return
+        eventLog.append(f"{shooterName} tagged the enemy base! (+100)")
+        
     else:
-        playerScores[shooterP_ID] = playerScores.get(shooterP_ID, 0) + 10
-        return
+        taggedTeam, tagged = find_player(taggedID)
+
+        if None in (taggedTeam, tagged):
+            return
+
+        taggedP_ID = str(tagged[0])
+        taggedName = tagged[1]
+
+        # Friendly fire
+        if shooterTeam == taggedTeam:
+            playerScores[shooterP_ID] = playerScores.get(shooterP_ID, 0) - 10
+            playerScores[taggedP_ID] = playerScores.get(taggedP_ID, 0) - 10
+
+            eventLog.append(f"{shooterName} tagged teammate {taggedName} (-10 each)")
+
+        # Opposing team
+        else:
+            playerScores[shooterP_ID] = playerScores.get(shooterP_ID, 0) + 10
+
+            eventLog.append(f"{shooterName} tagged {taggedName}! (+10)")
+
+    # Remove older events when the log gets too long
+    if len(eventLog) > MAX_EVENT_LOG:
+        eventLog.pop(0)
+
  
 
 def playAction(network: SocketManager, red, green) -> int:
@@ -225,7 +238,7 @@ def playAction(network: SocketManager, red, green) -> int:
     screen.blit(actionBackground, (actionBox.x + 3, actionBox.y + 3))
     draw_titled_box(screen, actionBox, "Current Game Action")
 
-    # Most recent events at the bottom. Nothing gets added to eventLog yet.
+    #Most recent events at the bottom.
     maxLines = (actionBox.height - 20) // 20
     for index, line in enumerate(eventLog[-maxLines:]):
         lineSurface = actionFont.render(line, True, whiteText)
