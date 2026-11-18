@@ -117,7 +117,7 @@ def recieve_action_data(network: SocketManager):
             shooterID = int(shooterID)
             taggedID = int(taggedID)
             # Send Data to Action Function:
-            handle_action(shooterID, taggedID)
+            handle_action(network, shooterID, taggedID)
         except ValueError:
             print(f"Invalid data received: {received_data}") # This shouldn't happen but it's here just in case hardware or generator produce unexpected values.
 
@@ -130,7 +130,7 @@ def find_player(equipmentID):
     return None, None
 
 # Handle Incoming Actions:
-def handle_action(shooterID, taggedID):
+def handle_action(network: SocketManager, shooterID, taggedID):
     shooterTeam, shooter = find_player(shooterID)
     if None in (shooterTeam, shooter):
         return
@@ -146,6 +146,7 @@ def handle_action(shooterID, taggedID):
         baseShooters[shooterP_ID] = True
 
         eventLog.append(f"{shooterName} tagged the enemy base! (+100)")
+        #network.broadcast_tag(taggedID)
         
     else:
         taggedTeam, tagged = find_player(taggedID)
@@ -162,12 +163,14 @@ def handle_action(shooterID, taggedID):
             playerScores[taggedP_ID] = playerScores.get(taggedP_ID, 0) - 10
 
             eventLog.append(f"{shooterName} tagged teammate {taggedName} (-10 each)")
+            network.broadcast_friendly_fire(shooterID, taggedID)
 
         # Opposing team
         else:
             playerScores[shooterP_ID] = playerScores.get(shooterP_ID, 0) + 10
 
             eventLog.append(f"{shooterName} tagged {taggedName}! (+10)")
+            network.broadcast_tag(taggedID)
 
     # Remove older events when the log gets too long
     if len(eventLog) > MAX_EVENT_LOG:
