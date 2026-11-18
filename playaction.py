@@ -129,6 +129,18 @@ def find_player(equipmentID):
                 return teamName, player
     return None, None
 
+def get_highest_scorer():
+    highest_score = -1
+    highest_scorer = None
+    for team in (redTeam, greenTeam):
+        for player in team:
+            if player[0] is not None:  #Ensure the player has an ID
+                score = playerScores.get(str(player[0]), 0)
+                if score > highest_score:
+                    highest_score = score
+                    highest_scorer = player[1]  #Get the codename of the player
+    return highest_scorer, highest_score
+    
 # Handle Incoming Actions:
 def handle_action(network: SocketManager, shooterID, taggedID):
     shooterTeam, shooter = find_player(shooterID)
