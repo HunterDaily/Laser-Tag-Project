@@ -39,6 +39,7 @@ greenNameX, greenScoreX = 515, 955
 
 #Preloading base icon
 baseIcon = pygame.image.load("photon-main/baseicon.jpg")
+baseIcon = pygame.transform.scale(baseIcon, (20, 11))
 
 clock = pygame.time.Clock()
 startTime = None          # Set on the first call to playAction().
@@ -69,18 +70,20 @@ def draw_team(screen, team, nameX, scoreRightX, color):
     for player in team:
         playerID, codename = player[0], player[1]
         if playerID is not None and codename is not None:
-            rows.append((str(codename), playerScores.get(str(playerID), 0)))
+            rows.append((str(codename), playerScores.get(str(playerID), 0), baseShooters.get(str(playerID), False)))
 
     rows.sort(key=lambda row: row[1], reverse=True) # Highest score on top.
 
-    for index, (codename, score) in enumerate(rows):
+    for index, (codename, score, taggedBase) in enumerate(rows):
         y = ROW_START_Y + index * ROW_HEIGHT
         nameSurface = playerFont.render(codename, True, color)
         scoreSurface = playerFont.render(str(score), True, color)
         screen.blit(nameSurface, (nameX, y))
         screen.blit(scoreSurface, scoreSurface.get_rect(topright=(scoreRightX, y)))
+        if taggedBase:
+            screen.blit(baseIcon, (nameX + nameSurface.get_width() + 5, y))
 
-    total = sum(score for _, score in rows)
+    total = sum(score for _, score, _ in rows)
     totalSurface = playerFont.render(str(total), True, color)
     screen.blit(totalSurface, totalSurface.get_rect(topright=(scoreRightX, TOTAL_Y)))
     return total
@@ -153,14 +156,15 @@ def handle_action(shooterID, taggedID):
     if (shooterTeam == taggedTeam):
         playerScores[shooterP_ID] = playerScores.get(shooterP_ID, 0) - 10
         playerScores[taggedP_ID] = playerScores.get(taggedP_ID, 0) - 10
+        
     else:
         playerScores[shooterP_ID] = playerScores.get(shooterP_ID, 0) + 10
  
 
 def playAction(network: SocketManager, red, green) -> int:
+    global startTime, actionBackground, gameOver, endBroadcastSent, redTeam, greenTeam
     redTeam = red
     greenTeam = green
-    global startTime, actionBackground, gameOver, endBroadcastSent
 
     screen = pygame.display.get_surface()
 
