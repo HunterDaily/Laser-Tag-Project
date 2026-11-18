@@ -82,7 +82,7 @@ def draw_team(screen, team, nameX, scoreRightX, color):
         screen.blit(nameSurface, (nameX, y))
         screen.blit(scoreSurface, scoreSurface.get_rect(topright=(scoreRightX, y)))
         if taggedBase:
-            screen.blit(baseIcon, (nameX + nameSurface.get_width() + 5, y))
+            screen.blit(baseIcon, (nameX - 20, y))
 
     total = sum(score for _, score, _ in rows)
     totalSurface = playerFont.render(str(total), True, color)
