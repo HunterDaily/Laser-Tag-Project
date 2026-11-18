@@ -140,6 +140,31 @@ def get_highest_scorer():
                     highest_score = score
                     highest_scorer = player[1]  #Get the codename of the player
     return highest_scorer, highest_score
+
+# function for getting the team with the higher score
+def get_highest_teamscore():
+    redTotal = 0
+    greenTotal = 0
+
+    # for loop that gets the redTeam's total score
+    for player in redTeam:
+        if player[0] is not None:
+            playerID = str(player[0])
+            redTotal += playerScores.get(playerID, 0)
+
+    # for loop that gets the greenTeam's total score
+    for player in greenTeam:
+        if player[0] is not None:
+            playerID = str(player[0])
+            redTotal += playerScores.get(playerID, 0)
+    
+    # returns the team with the higher score or None if they're equal
+    if redTotal > greenTotal:
+        return redTotal
+    elif greenTotal > redTotal:
+        return greenTotal
+    else:
+        return None
     
 # Handle Incoming Actions:
 def handle_action(network: SocketManager, shooterID, taggedID):
