@@ -124,7 +124,7 @@ def recieve_action_data(network: SocketManager):
 def find_player(equipmentID):
     for teamName, team in (("red", redTeam), ("green", greenTeam)):
         for player in team:
-            if player[2] is not None and player[2] == equipmentID:
+            if player[2] is not None and int(player[2]) == equipmentID:
                 return teamName, player
     return None, None
 
@@ -156,9 +156,10 @@ def handle_action(shooterID, taggedID):
     if (shooterTeam == taggedTeam):
         playerScores[shooterP_ID] = playerScores.get(shooterP_ID, 0) - 10
         playerScores[taggedP_ID] = playerScores.get(taggedP_ID, 0) - 10
-        
+        return
     else:
         playerScores[shooterP_ID] = playerScores.get(shooterP_ID, 0) + 10
+        return
  
 
 def playAction(network: SocketManager, red, green) -> int:
