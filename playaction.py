@@ -91,7 +91,14 @@ def draw_team(screen, team, nameX, scoreRightX, color):
             screen.blit(baseIcon, (nameX - 20, y))
 
     total = sum(score for _, score, _ in rows)
-    totalSurface = playerFont.render(str(total), True, color)
+
+    # if else statement for flashing the highest scoring team or not if both have the same score
+    if ((team == redTeam and get_highest_teamscore() == "red") or (team == greenTeam and get_highest_teamscore() == "green")) and pygame.time.get_ticks() % 1000 < 500:
+        totalColor = (0, 0, 0) #Highlight the highest scoring team
+    else:
+        totalColor = color
+
+    totalSurface = playerFont.render(str(total), True, totalColor)
     screen.blit(totalSurface, totalSurface.get_rect(topright=(scoreRightX, TOTAL_Y)))
     return total
 
@@ -162,13 +169,13 @@ def get_highest_teamscore():
     for player in greenTeam:
         if player[0] is not None:
             playerID = str(player[0])
-            redTotal += playerScores.get(playerID, 0)
+            greenTotal += playerScores.get(playerID, 0)
     
     # returns the team with the higher score or None if they're equal
     if redTotal > greenTotal:
-        return redTotal
+        return "red"
     elif greenTotal > redTotal:
-        return greenTotal
+        return "green"
     else:
         return None
     
