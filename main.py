@@ -2,7 +2,7 @@ import sys
 import splashentry
 import playaction
 import MusicManager
-import SocketManager
+from SocketManager import SocketManager
 
 conn, curr = splashentry.connect_to_database()
 
