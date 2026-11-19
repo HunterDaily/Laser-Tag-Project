@@ -9,6 +9,7 @@ pygame.init()
 
 # Setup Network
 def setup_network(passed_network):
+    global network
     network = passed_network
 
 # Network Popup Variables:
