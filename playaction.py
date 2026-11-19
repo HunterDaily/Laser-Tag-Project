@@ -78,7 +78,7 @@ def draw_team(screen, team, nameX, scoreRightX, color):
     for index, (codename, score, taggedBase) in enumerate(rows):
         y = ROW_START_Y + index * ROW_HEIGHT
         highest_scorer, highest_score = get_highest_scorer()
-        if (codename == highest_scorer and score == highest_score and pygame.time.get_ticks() % 1000 < 500):
+        if (codename == highest_scorer and score == highest_score and pygame.time.get_ticks() % 1000 < 500 and highest_score != 0):
             temp_color = (0, 0, 0) # Highlight the highest scorer in black text.
             nameSurface = playerFont.render(codename, True, temp_color)
             scoreSurface = playerFont.render(str(score), True, temp_color)
@@ -152,7 +152,10 @@ def get_highest_scorer():
                 if score > highest_score:
                     highest_score = score
                     highest_scorer = player[1]  #Get the codename of the player
-    return highest_scorer, highest_score
+    if highest_score <= 0:
+        return None, 0  #No player has a score greater than 0
+    else:
+        return highest_scorer, highest_score
 
 # function for getting the team with the higher score
 def get_highest_teamscore():
