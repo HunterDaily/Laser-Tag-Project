@@ -2,6 +2,7 @@ import sys
 import splashentry
 import playaction
 import MusicManager
+import SocketManager
 
 conn, curr = splashentry.connect_to_database()
 
@@ -13,6 +14,10 @@ SCREEN_QUIT = -1
 currScreen = SCREEN_SPLASH
 quitGame = False
 
+# Initialize Network
+network = SocketManager()
+splashentry.setup_network(network)
+
 while not quitGame:
     if currScreen == SCREEN_SPLASH:
         splashentry.splashScreen()
@@ -23,7 +28,7 @@ while not quitGame:
         splashentry.countDown()
         currScreen = SCREEN_PLAY
     elif currScreen == SCREEN_PLAY:
-        currScreen = playaction.playAction(splashentry.network, splashentry.redTeam, splashentry.greenTeam)
+        currScreen = playaction.playAction(network, splashentry.redTeam, splashentry.greenTeam)
     else:
         quitGame = True
 

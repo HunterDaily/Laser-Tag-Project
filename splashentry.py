@@ -4,11 +4,12 @@ import psycopg # type: ignore -> Just so we don't have constantly get an import 
 from SocketManager import SocketManager # Custom networking class.
 import MusicManager # Custom music manager class.
 
-# Initialize socket manager
-network = SocketManager()
-
 # Start pygame
 pygame.init()
+
+# Setup Network
+def setup_network(passed_network):
+    network = passed_network
 
 # Network Popup Variables:
 networkPopup = False
